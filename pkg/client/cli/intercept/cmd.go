@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -132,6 +133,11 @@ func (a *Args) Validate(cmd *cobra.Command, positional []string) error {
 		}
 		return nil
 	}
+	if a.Mechanism == "http" && len(a.HttpHeader) > 0 {
+		if err := a.validateHttpHeader(); err != nil {
+			return err
+		}
+	}
 	// Actually intercepting something
 	if a.AgentName == "" {
 		a.AgentName = a.Name
@@ -245,4 +251,28 @@ func (a *Args) GetMountPoint(ctx context.Context) (string, bool, error) {
 	}
 
 	return mountPoint, doMount, err
+}
+
+func (a *Args) validateHttpHeader() error {
+	for _, h := range a.HttpHeader {
+		switch h {
+		case "auto":
+			return nil
+		case "all":
+			return nil
+		default:
+			matched, err := regexp.MatchString(`^[\w-]+=.*$`, h)
+			if err != nil {
+				return err
+			}
+
+			if !matched {
+				return errcat.User.New("http-header not set properly accepting <key>=<value> pairs validating with regex \"^[\\w=]+=.*$\"  ")
+			}
+
+			return nil
+		}
+	}
+
+	return nil
 }
