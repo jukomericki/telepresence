@@ -54,6 +54,18 @@ func Test_getArg(t *testing.T) {
 			"value",
 			false,
 		},
+		{
+			args:    []string{"--mechanism", "http", "--http-header", "dev=john"},
+			flag:    "--http-header",
+			wantV:   "dev=john",
+			wantErr: false,
+		},
+		{
+			args:    []string{"--mechanism", "http", "--http-header", "dev=john"},
+			flag:    "--http-header",
+			wantV:   "",
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(strings.Join(tt.args, "_"), func(t *testing.T) {
