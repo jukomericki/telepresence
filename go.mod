@@ -13,6 +13,7 @@ require (
 	github.com/datawire/go-fuseftp/rpc v0.2.0
 	github.com/datawire/k8sapi v0.1.2
 	github.com/datawire/metriton-go-client v0.1.1
+	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/golang/mock v1.6.0

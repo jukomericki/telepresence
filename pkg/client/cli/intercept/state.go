@@ -114,13 +114,13 @@ func create(sif State, ctx context.Context) (acquired bool, err error) {
 	s.scout.SetMetadatum(ctx, "cluster_id", status.ClusterId)
 	s.scout.SetMetadatum(ctx, "intercept_mechanism", s.Mechanism)
 	s.scout.SetMetadatum(ctx, "intercept_mechanism_numargs", len(s.MechanismArgs))
-	s.scout.SetMetadatum(ctx, "http-headers", len(s.HttpHeader))
 
 	ir, err := sif.CreateRequest(ctx)
 	if err != nil {
 		s.scout.Report(ctx, "intercept_validation_fail", scout.Entry{Key: "error", Value: err.Error()})
 		return false, err
 	}
+	s.scout.SetMetadatum(ctx, "http-headers", len(ir.Spec.HttpHeaders))
 
 	if ir.MountPoint != "" {
 		defer func() {
@@ -280,15 +280,18 @@ func (s *state) CreateRequest(ctx context.Context) (*connector.CreateInterceptRe
 		spec.ServiceName = s.ServiceName
 	}
 
-	// TODO: ovdje bi moglo ici ovo sa headerima
+	headers, err := generateHttpHeaders(s.HttpHeader)
+	if err != nil {
+		return nil, err
+	}
+
 	spec.Mechanism = s.Mechanism
 	spec.MechanismArgs = s.MechanismArgs
-	spec.HttpHeaders = s.HttpHeader
+	spec.HttpHeaders = headers
 	spec.Agent = s.AgentName
 	spec.TargetHost = "127.0.0.1"
 
 	// Parse port into spec based on how it's formatted
-	var err error
 	s.localPort, s.dockerPort, spec.ServicePortIdentifier, err = parsePort(s.Port, s.DockerRun)
 	if err != nil {
 		return nil, err
@@ -330,6 +333,26 @@ func (s *state) CreateRequest(ctx context.Context) (*connector.CreateInterceptRe
 		}
 	}
 	return ir, nil
+}
+
+func generateHttpHeaders(headers []string) ([]string, error) {
+	newHeaders := make([]string, 0, len(headers))
+
+	for _, header := range headers {
+		var newHeader string
+		if header == "auto" {
+			uniqueValue, err := util.UniqueValue()
+			if err != nil {
+				return nil, err
+			}
+
+			newHeader = "dev=" + uniqueValue
+		}
+
+		newHeaders = append(newHeaders, newHeader)
+	}
+
+	return newHeaders, nil
 }
 
 // getUnparsedFlagValue returns the value of a flag that has been provided after a "--" on the command
