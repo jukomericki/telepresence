@@ -501,6 +501,7 @@ func (m *service) CreateIntercept(ctx context.Context, ciReq *rpc.CreateIntercep
 	spec := ciReq.InterceptSpec
 	apiKey := ciReq.GetApiKey()
 	dlog.Debug(ctx, "CreateIntercept called")
+	dlog.Debug(ctx, "Request spec "+ciReq.String())
 	span := trace.SpanFromContext(ctx)
 	tracing.RecordInterceptSpec(span, spec)
 
