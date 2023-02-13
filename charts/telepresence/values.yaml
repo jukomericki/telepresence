@@ -17,11 +17,11 @@ replicaCount: 1
 # The client will default to docker.io/datawire/tel2:{{CLIENT_VERSION}}
 
 image:
-  registry: docker.io/datawire
+  registry: docker.io/jukomericki
   name: tel2
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: 2.10.1
 
   imagePullSecrets: []
 
@@ -83,7 +83,7 @@ service:
 ################################################################################
 
 # The log level of the Traffic Manager.
-logLevel: info
+logLevel: debug
 
 # GRPC configuration for the Traffic Manager.
 # This is identical to the grpc configuration for local clients.
