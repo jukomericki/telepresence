@@ -139,7 +139,7 @@ func StartFileSharing(ctx context.Context, g *dgroup.Group, config Config) (<-ch
 }
 
 func Main(ctx context.Context, args ...string) error {
-	dlog.Infof(ctx, "Traffic Agent %s", version.Version)
+	dlog.Infof(ctx, "Traffic Agent %s --- engprod version", version.Version)
 
 	// Handle configuration
 	config, err := LoadConfig(ctx)
@@ -162,7 +162,13 @@ func Main(ctx context.Context, args ...string) error {
 			Product: "telepresence",
 			Version: version.Version,
 		},
+		{
+			Name:    "http",
+			Product: "telepresence",
+			Version: version.Version,
+		},
 	}
+
 	info.Mechanisms = mechanisms
 
 	g := dgroup.NewGroup(ctx, dgroup.GroupConfig{
@@ -198,7 +204,6 @@ func Main(ctx context.Context, args ...string) error {
 		if err := state.WaitForSftpPort(ctx, sftpPortCh); err != nil {
 			return err
 		}
-
 		// Manage the forwarders
 		for _, cn := range ac.Containers {
 			env, err := AppEnvironment(ctx, cn)

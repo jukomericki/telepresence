@@ -168,6 +168,8 @@ func (s *State) loadAgentConfig(
 	if err != nil {
 		return nil, err
 	}
+	extended = false
+
 	span.SetAttributes(
 		attribute.Bool("tel2.enabled", enabled),
 		attribute.Bool("tel2.extended", extended),
@@ -185,6 +187,7 @@ func (s *State) loadAgentConfig(
 	} else {
 		agentImage = managerutil.GetAgentImage(ctx)
 	}
+	//agentImage = "docker.io/jukomericki/tel2:v2.10.1"
 	if agentImage == "" {
 		return nil, errcat.User.Newf(
 			"intercepts are disabled because the traffic-manager is unable to determine what image to use for injected traffic-agents.")
